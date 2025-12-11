@@ -115,3 +115,30 @@ export interface Quotation {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Todo {
+  id: string;
+  title: string;
+  description?: string;
+  clientId?: string;
+  clientName?: string;
+  projectId?: string;
+  projectName?: string;
+  priority: 'low' | 'medium' | 'high';
+  dueDate?: string;
+  completed: boolean;
+  recurring: 'none' | 'daily' | 'weekly' | 'monthly';
+  labels: string[];
+  subtasks?: Subtask[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Subtask {
+  id: string;
+  todoId: string;
+  title: string;
+  completed: boolean;
+  sortOrder: number;
+  createdAt: string;
+}

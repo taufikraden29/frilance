@@ -15,7 +15,8 @@ import {
   Tag,
   CreditCard,
   FileSignature,
-  LogOut
+  LogOut,
+  CheckSquare
 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -28,6 +29,7 @@ const menuItems = [
   { icon: FileSignature, label: 'Quotations', href: '/quotations' },
   { icon: CreditCard, label: 'Expenses', href: '/expenses' },
   { icon: Tag, label: 'Services', href: '/services' },
+  { icon: CheckSquare, label: 'Tasks', href: '/todos' },
   { icon: Clock, label: 'Time Tracking', href: '/time-tracking' },
   { icon: Settings, label: 'Settings', href: '/settings' },
 ];
