@@ -5,9 +5,13 @@ import { TimeEntry } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 // Get all time entries
+const FIVE_MINUTES = 5 * 60 * 1000;
+
 export function useTimeEntries() {
   return useQuery({
     queryKey: ['time-entries'],
+    staleTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('time_entries')

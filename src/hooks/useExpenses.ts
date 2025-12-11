@@ -5,9 +5,13 @@ import { Expense } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 // Get all expenses
+const FIVE_MINUTES = 5 * 60 * 1000;
+
 export function useExpenses() {
   return useQuery({
     queryKey: ['expenses'],
+    staleTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('expenses')

@@ -14,9 +14,13 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 
 // Get settings
+const TEN_MINUTES = 10 * 60 * 1000;
+
 export function useSettings() {
   return useQuery({
     queryKey: ['settings'],
+    staleTime: TEN_MINUTES,
+    gcTime: TEN_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('settings')

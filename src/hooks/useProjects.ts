@@ -5,9 +5,13 @@ import { Project } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 // Get all projects
+const FIVE_MINUTES = 5 * 60 * 1000;
+
 export function useProjects() {
   return useQuery({
     queryKey: ['projects'],
+    staleTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
@@ -37,6 +41,8 @@ export function useProjects() {
 export function useProject(id: string) {
   return useQuery({
     queryKey: ['projects', id],
+    staleTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')

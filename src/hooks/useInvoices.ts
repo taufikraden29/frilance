@@ -14,9 +14,13 @@ function generateInvoiceNumber(): string {
 }
 
 // Get all invoices
+const FIVE_MINUTES = 5 * 60 * 1000;
+
 export function useInvoices() {
   return useQuery({
     queryKey: ['invoices'],
+    staleTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('invoices')

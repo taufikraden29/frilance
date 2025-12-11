@@ -5,9 +5,13 @@ import { Client } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 // Get all clients
+const FIVE_MINUTES = 5 * 60 * 1000;
+
 export function useClients() {
   return useQuery({
     queryKey: ['clients'],
+    staleTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('clients')

@@ -5,9 +5,13 @@ import { ServiceItem } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 // Get all services
+const FIVE_MINUTES = 5 * 60 * 1000;
+
 export function useServices() {
   return useQuery({
     queryKey: ['services'],
+    staleTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('services')

@@ -14,9 +14,13 @@ function generateQuotationNumber(): string {
 }
 
 // Get all quotations
+const FIVE_MINUTES = 5 * 60 * 1000;
+
 export function useQuotations() {
   return useQuery({
     queryKey: ['quotations'],
+    staleTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES * 2,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('quotations')

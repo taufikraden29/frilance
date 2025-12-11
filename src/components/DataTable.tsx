@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 
 interface Column<T> {
   key: keyof T | string;
@@ -16,7 +16,7 @@ interface DataTableProps<T> {
   emptyMessage?: string;
 }
 
-export function DataTable<T extends { id: string }>({
+function DataTableComponent<T extends { id: string }>({
   columns,
   data,
   onRowClick,
@@ -72,3 +72,5 @@ export function DataTable<T extends { id: string }>({
     </div>
   );
 }
+
+export const DataTable = memo(DataTableComponent) as typeof DataTableComponent;

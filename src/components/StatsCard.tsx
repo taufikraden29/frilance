@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { memo } from 'react';
 import { LucideIcon } from 'lucide-react';
 
 interface StatsCardProps {
@@ -51,7 +51,7 @@ const colorClasses = {
   },
 };
 
-export function StatsCard({ icon: Icon, label, value, change, color = 'emerald' }: StatsCardProps) {
+export const StatsCard = memo(function StatsCard({ icon: Icon, label, value, change, color = 'emerald' }: StatsCardProps) {
   const classes = colorClasses[color];
 
   return (
@@ -75,4 +75,4 @@ export function StatsCard({ icon: Icon, label, value, change, color = 'emerald' 
       </div>
     </div>
   );
-}
+});
