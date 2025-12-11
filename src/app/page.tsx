@@ -1,65 +1,243 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { Header } from '@/components/Header';
+import { StatsCard } from '@/components/StatsCard';
+import { DataTable } from '@/components/DataTable';
+import { useProjects } from '@/hooks/useProjects';
+import { useClients } from '@/hooks/useClients';
+import { useInvoices } from '@/hooks/useInvoices';
+import { useTimeEntries, useMonthlyTimeEntries } from '@/hooks/useTimeEntries';
+import {
+  FolderKanban,
+  Users,
+  DollarSign,
+  Clock,
+  TrendingUp,
+  FileText,
+  ArrowRight,
+  Wallet,
+  CreditCard
+} from 'lucide-react';
+import Link from 'next/link';
+import { Project, Invoice } from '@/lib/types';
+import { STATUS_STYLES } from '@/lib/styles';
+import { useExpenses } from '@/hooks/useExpenses';
+
+export default function Dashboard() {
+  const { data: projects = [] } = useProjects();
+  const { data: clients = [] } = useClients();
+  const { data: invoices = [] } = useInvoices();
+  const { data: monthlyEntries = [] } = useMonthlyTimeEntries();
+
+  const activeProjects = projects.filter(p => p.status === 'in-progress').length;
+  const totalRevenue = invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + i.total, 0);
+  const { data: expenses = [] } = useExpenses();
+  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const netProfit = totalRevenue - totalExpenses;
+
+  const pendingInvoices = invoices.filter(i => i.status === 'sent' || i.status === 'draft').length;
+  const monthlyHours = monthlyEntries.reduce((sum, e) => sum + e.hours, 0);
+
+  const recentProjects = projects.slice(-5).reverse();
+  const recentInvoices = invoices.slice(-5).reverse();
+
+  const projectColumns = [
+    {
+      key: 'name',
+      header: 'Project',
+      render: (item: Project) => (
+        <div>
+          <p className="font-medium text-white">{item.name}</p>
+          <p className="text-sm text-gray-400">{item.clientName || 'No client'}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (item: Project) => (
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[item.status]}`}>
+          {item.status.replace('-', ' ')}
+        </span>
+      ),
+    },
+    {
+      key: 'budget',
+      header: 'Budget',
+      render: (item: Project) => (
+        <span className="text-emerald-400 font-medium">
+          Rp {item.budget.toLocaleString('id-ID')}
+        </span>
+      ),
+    },
+    {
+      key: 'deadline',
+      header: 'Deadline',
+      render: (item: Project) => (
+        <span className="text-gray-400">
+          {new Date(item.deadline).toLocaleDateString('id-ID')}
+        </span>
+      ),
+    },
+  ];
+
+  const invoiceColumns = [
+    {
+      key: 'invoiceNumber',
+      header: 'Invoice',
+      render: (item: Invoice) => (
+        <span className="font-medium text-white">{item.invoiceNumber}</span>
+      ),
+    },
+    {
+      key: 'clientName',
+      header: 'Client',
+      render: (item: Invoice) => (
+        <span className="text-gray-400">{item.clientName}</span>
+      ),
+    },
+    {
+      key: 'total',
+      header: 'Amount',
+      render: (item: Invoice) => (
+        <span className="text-emerald-400 font-medium">
+          Rp {item.total.toLocaleString('id-ID')}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (item: Invoice) => (
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[item.status]}`}>
+          {item.status}
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-gray-950">
+      <Header
+        title="Dashboard"
+        subtitle="Welcome back! Here's your freelance overview."
+      />
+
+      <div className="p-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatsCard
+            icon={FolderKanban}
+            label="Total Projects"
+            value={projects.length}
+            change={{ value: 12, positive: true }}
+            color="emerald"
+          />
+          <StatsCard
+            icon={Users}
+            label="Total Clients"
+            value={clients.length}
+            color="blue"
+          />
+          <StatsCard
+            icon={DollarSign}
+            label="Total Revenue"
+            value={`Rp ${totalRevenue.toLocaleString('id-ID')}`}
+            change={{ value: 8, positive: true }}
+            color="emerald"
+          />
+          <StatsCard
+            icon={CreditCard}
+            label="Total Expenses"
+            value={`Rp ${totalExpenses.toLocaleString('id-ID')}`}
+            color="red"
+          />
+          <StatsCard
+            icon={Wallet}
+            label="Net Profit"
+            value={`Rp ${netProfit.toLocaleString('id-ID')}`}
+            change={{ value: 10, positive: true }}
+            color="blue"
+          />
+          <StatsCard
+            icon={Clock}
+            label="Hours This Month"
+            value={monthlyHours.toFixed(1)}
+            color="orange"
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {/* Quick Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="p-6 glass rounded-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Active Projects</h3>
+              <TrendingUp className="w-5 h-5 text-emerald-400" />
+            </div>
+            <p className="text-4xl font-bold gradient-text">{activeProjects}</p>
+            <p className="text-gray-400 text-sm mt-2">projects in progress</p>
+          </div>
+
+          <div className="p-6 glass rounded-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Pending Invoices</h3>
+              <FileText className="w-5 h-5 text-yellow-400" />
+            </div>
+            <p className="text-4xl font-bold text-yellow-400">{pendingInvoices}</p>
+            <p className="text-gray-400 text-sm mt-2">awaiting payment</p>
+          </div>
+
+          <div className="p-6 glass rounded-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Avg Hourly Rate</h3>
+              <DollarSign className="w-5 h-5 text-emerald-400" />
+            </div>
+            <p className="text-4xl font-bold gradient-text">
+              {monthlyHours > 0 ? `Rp ${Math.round(totalRevenue / monthlyHours).toLocaleString('id-ID')}` : 'N/A'}
+            </p>
+            <p className="text-gray-400 text-sm mt-2">this month</p>
+          </div>
+        </div>
+
+        {/* Tables Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Recent Projects */}
+          <div className="glass rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+              <h3 className="text-lg font-semibold text-white">Recent Projects</h3>
+              <Link
+                href="/projects"
+                className="flex items-center gap-1 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                View all <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <DataTable
+              columns={projectColumns}
+              data={recentProjects}
+              emptyMessage="No projects yet. Create your first project!"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+
+          {/* Recent Invoices */}
+          <div className="glass rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+              <h3 className="text-lg font-semibold text-white">Recent Invoices</h3>
+              <Link
+                href="/invoices"
+                className="flex items-center gap-1 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                View all <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <DataTable
+              columns={invoiceColumns}
+              data={recentInvoices}
+              emptyMessage="No invoices yet. Create your first invoice!"
+            />
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
