@@ -20,9 +20,11 @@ import {
   LogOut,
   KanbanSquare,
   FolderLock,
-  BookOpen // Added
+  BookOpen,
+  Globe // Added
 } from 'lucide-react';
 import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 const MENU_ITEMS = [
   { icon: Layout, label: 'Dashboard', href: '/' },
@@ -30,7 +32,8 @@ const MENU_ITEMS = [
   { icon: Users, label: 'Clients', href: '/clients' },
   { icon: FolderKanban, label: 'Projects', href: '/projects' },
   { icon: FolderLock, label: 'Vault', href: '/documents' },
-  { icon: BookOpen, label: 'Meeting Notes', href: '/meetings' }, // Added
+  { icon: BookOpen, label: 'Meeting Notes', href: '/meetings' },
+  { icon: Globe, label: 'Portfolio', href: '/portfolio' }, // Added
   { icon: CalendarDays, label: 'Calendar', href: '/calendar' },
   { icon: ListTodo, label: 'Tasks', href: '/todos' },
   { icon: FileText, label: 'Invoices', href: '/invoices' },

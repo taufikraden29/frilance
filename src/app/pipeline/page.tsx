@@ -40,14 +40,11 @@ export default function PipelinePage() {
         <Header
           title="Pipeline"
           subtitle="Manage your leads and client acquisition process."
-        >
-          <button
-            onClick={() => setIsCreateOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-emerald-500/20"
-          >
-            <Plus className="w-4 h-4" /> Add Lead
-          </button>
-        </Header>
+          action={{
+            label: "Add Lead",
+            onClick: () => setIsCreateOpen(true)
+          }}
+        />
       </div>
 
       <div className="flex-1 min-h-0 p-6 overflow-hidden">
