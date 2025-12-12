@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  FolderKanban,
+  Layout,
   Users,
+  FolderKanban,
   FileText,
   Clock,
   Settings,
@@ -13,35 +13,42 @@ import {
   ChevronLeft,
   ChevronRight,
   Tag,
-  CreditCard,
   FileSignature,
+  ListTodo,
+  Wallet,
+  CalendarDays,
   LogOut,
-  CheckSquare
+  KanbanSquare,
+  FolderLock,
+  BookOpen // Added
 } from 'lucide-react';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
-const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
-  { icon: FolderKanban, label: 'Projects', href: '/projects' },
+const MENU_ITEMS = [
+  { icon: Layout, label: 'Dashboard', href: '/' },
+  { icon: KanbanSquare, label: 'Pipeline', href: '/pipeline' },
   { icon: Users, label: 'Clients', href: '/clients' },
+  { icon: FolderKanban, label: 'Projects', href: '/projects' },
+  { icon: FolderLock, label: 'Vault', href: '/documents' },
+  { icon: BookOpen, label: 'Meeting Notes', href: '/meetings' }, // Added
+  { icon: CalendarDays, label: 'Calendar', href: '/calendar' },
+  { icon: ListTodo, label: 'Tasks', href: '/todos' },
   { icon: FileText, label: 'Invoices', href: '/invoices' },
   { icon: FileSignature, label: 'Quotations', href: '/quotations' },
-  { icon: CreditCard, label: 'Expenses', href: '/expenses' },
+  { icon: Wallet, label: 'Expenses', href: '/expenses' },
   { icon: Tag, label: 'Services', href: '/services' },
-  { icon: CheckSquare, label: 'Tasks', href: '/todos' },
   { icon: Clock, label: 'Time Tracking', href: '/time-tracking' },
   { icon: Settings, label: 'Settings', href: '/settings' },
 ];
 
 export function Sidebar() {
+  const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 border-r border-white/5 transition-all duration-300 z-40 ${collapsed ? 'w-20' : 'w-64'
-        }`}
+      className={`fixed left-0 top-0 h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 border-r border-white/5 transition-all duration-300 z-40 ${collapsed ? 'w-20' : 'w-64'}`}
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-white/5">
@@ -56,8 +63,8 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="px-3 py-6 space-y-1">
-        {menuItems.map((item) => {
+      <nav className="px-3 py-6 space-y-1 overflow-y-auto custom-scrollbar h-[calc(100vh-180px)]">
+        {MENU_ITEMS.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -68,8 +75,8 @@ export function Sidebar() {
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
             >
-              <item.icon className={`w-5 h-5 ${isActive ? 'text-emerald-400' : 'group-hover:text-emerald-400'} transition-colors`} />
-              {!collapsed && <span className="font-medium">{item.label}</span>}
+              <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-emerald-400' : 'group-hover:text-emerald-400'} transition-colors`} />
+              {!collapsed && <span className="font-medium truncate">{item.label}</span>}
             </Link>
           );
         })}
@@ -87,8 +94,13 @@ export function Sidebar() {
       <button
         onClick={async () => {
           if (confirm('Sign out?')) {
-            await fetch('/api/auth/logout', { method: 'POST' });
-            window.location.href = '/login';
+            try {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            } catch (e) {
+              console.error('Logout failed', e);
+              window.location.href = '/login';
+            }
           }
         }}
         className={`absolute bottom-20 left-4 right-4 flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-red-400 hover:bg-red-500/10 hover:text-red-300 ${collapsed ? 'justify-center px-0' : ''
@@ -97,6 +109,6 @@ export function Sidebar() {
         <LogOut className="w-5 h-5" />
         {!collapsed && <span className="font-medium">Logout</span>}
       </button>
-    </aside >
+    </aside>
   );
 }

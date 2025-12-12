@@ -28,6 +28,7 @@ export function useClients() {
         phone: c.phone,
         company: c.company,
         address: c.address,
+        status: c.status || 'active', // Default to active if missing
         createdAt: c.created_at,
         updatedAt: c.updated_at,
       })) as Client[];
@@ -49,6 +50,7 @@ export function useCreateClient() {
           phone: client.phone,
           company: client.company,
           address: client.address,
+          status: client.status || 'lead',
         })
         .select()
         .single();
@@ -68,16 +70,20 @@ export function useUpdateClient() {
 
   return useMutation({
     mutationFn: async ({ id, data: clientData }: { id: string; data: Partial<Client> }) => {
+      const payload: any = {
+        updated_at: new Date().toISOString(),
+      };
+
+      if (clientData.name) payload.name = clientData.name;
+      if (clientData.email) payload.email = clientData.email;
+      if (clientData.phone) payload.phone = clientData.phone;
+      if (clientData.company) payload.company = clientData.company;
+      if (clientData.address) payload.address = clientData.address;
+      if (clientData.status) payload.status = clientData.status;
+
       const { data, error } = await supabase
         .from('clients')
-        .update({
-          name: clientData.name,
-          email: clientData.email,
-          phone: clientData.phone,
-          company: clientData.company,
-          address: clientData.address,
-          updated_at: new Date().toISOString(),
-        })
+        .update(payload)
         .eq('id', id)
         .select()
         .single();

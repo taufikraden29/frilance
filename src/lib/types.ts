@@ -14,6 +14,8 @@ export interface Project {
   updatedAt: string;
 }
 
+export type ClientStatus = 'lead' | 'contacted' | 'proposal' | 'negotiation' | 'active' | 'closed' | 'lost';
+
 export interface Client {
   id: string;
   name: string;
@@ -21,6 +23,7 @@ export interface Client {
   phone: string;
   company: string;
   address: string;
+  status: ClientStatus; // Added
   createdAt: string;
   updatedAt: string;
 }
@@ -141,4 +144,40 @@ export interface Subtask {
   completed: boolean;
   sortOrder: number;
   createdAt: string;
+}
+
+export type DocumentType = 'contract' | 'brief' | 'invoice' | 'design' | 'other';
+
+export interface Document {
+  id: string;
+  name: string;
+  type: DocumentType;
+  url: string;
+  clientId?: string;
+  clientName?: string;
+  projectId?: string;
+  projectName?: string;
+  uploadedAt: string;
+}
+
+export interface ActionItem {
+  id: string;
+  task: string;
+  done: boolean;
+}
+
+export interface Meeting {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  clientId?: string;
+  clientName?: string;
+  projectId?: string;
+  projectName?: string;
+  attendees: string[];
+  content: string; // Markdown
+  actionItems: ActionItem[];
+  createdAt: string;
+  updatedAt: string;
 }
